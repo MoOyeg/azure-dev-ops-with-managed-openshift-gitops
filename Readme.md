@@ -40,6 +40,9 @@ Example method to be run inside cloned repo folder
   TF_VAR_AZP_URL = AZURE DevOps Org URL
   TF_VAR_AZP_TOKEN = Azure DevOps Personal Access Token
   TF_VAR_AZP_POOL = Azure DevOps Pool name set in azure-pipelines.yaml above
+  TF_VAR_GITHUB_REPO_NAME =  Your Github Repo
+  TF_VAR_GITHUB_REPO_BRANCH = Github Branch for your Repo
+  TF_VAR_GITHUB_AZURE_PIPELINE_PATH = Path in Github Repo for azure-pipelines file.
   TF_VAR_AZDO_GITHUB_SERVICE_CONNECTION_PAT = Github Personal Token
   TF_VAR_KUBE_CONFIG_PATH = Path to active kubeconfig file
 
@@ -48,6 +51,9 @@ Example method to be run inside cloned repo folder
   export TF_VAR_AZP_URL=https://dev.azure.com/YourOrg
   export TF_VAR_AZP_TOKEN=.......
   export TF_VAR_AZP_POOL="AzurePipeline"
+  export TF_VAR_GITHUB_REPO_NAME="MoOyeg/azure-pipelines-openshift"
+  export TF_VAR_GITHUB_REPO_BRANCH="main"
+  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="azure-pipelines.yml"
   export AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
   export AZDO_ORG_SERVICE_URL=${TF_VAR_AZP_URL}
   export TF_VAR_AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
@@ -87,7 +93,7 @@ Example method to be run inside cloned repo folder
   ```
 
 
-## Helm Only
+### Helm Only for Example 1
 If you do not want the end-to-end terraform install and want to do those manually. Run the same steps except the terraform from above.Helm can be used to deploy the rest.
 
 ```bash
@@ -115,4 +121,33 @@ helm uninstall azure-build-agent-openshift --namespace azure-build
 helm uninstall azure-pipeline-openshift --namespace ado-openshift
 ```
 
+## Example 2
 
+
+
+- Export the variables needed for automation
+  TF_VAR_AZP_URL = AZURE DevOps Org URL
+  TF_VAR_AZP_TOKEN = Azure DevOps Personal Access Token
+  TF_VAR_AZP_POOL = Azure DevOps Pool name set in azure-pipelines.yaml above
+  TF_VAR_GITHUB_REPO_NAME =  Your Github Repo(For Example 2 should be your fork of this repo)
+  TF_VAR_GITHUB_REPO_BRANCH = Github Branch for your Repo
+  TF_VAR_GITHUB_AZURE_PIPELINE_PATH = Path in Github Repo for azure-pipelines file.
+  TF_VAR_AZDO_GITHUB_SERVICE_CONNECTION_PAT = Github Personal Token
+  TF_VAR_KUBE_CONFIG_PATH = Path to active kubeconfig file
+
+  Example
+  ```bash
+  export TF_VAR_AZP_URL=https://dev.azure.com/YourOrg
+  export TF_VAR_AZP_TOKEN=.......
+  export TF_VAR_AZP_POOL="AzurePipeline"
+  export TF_VAR_GITHUB_REPO_NAME="MoOyeg/azure-dev-ops-with-managed-openshift-gitops"
+  export TF_VAR_GITHUB_REPO_BRANCH="main"
+  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="pipeline-example2-terraform/azure/azure-pipelines.yml"
+  export AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
+  export AZDO_ORG_SERVICE_URL=${TF_VAR_AZP_URL}
+  export TF_VAR_AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
+  export TF_VAR_AZDO_ORG_SERVICE_URL=${TF_VAR_AZP_URL}
+  export TF_VAR_AZDO_GITHUB_SERVICE_CONNECTION_PAT=.........
+  export KUBE_CONFIG_PATH=${KUBECONFIG}
+  export TF_VAR_KUBE_CONFIG_PATH=${KUBECONFIG}
+  ```

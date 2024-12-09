@@ -22,6 +22,19 @@ variable "AZP_POOL" {
   type = string
 }
 
+variable "GITHUB_REPO_NAME" {
+  type = string
+}
+
+variable "GITHUB_REPO_BRANCH" {
+  type = string
+  default = "main"
+}
+
+variable "GITHUB_AZURE_PIPELINE_PATH" {
+  type = string
+  default = "azure-pipelines.yml"
+}
 
 variable "PIPELINE_NAMESPACE" {
   type = string
@@ -58,11 +71,10 @@ variable "IMAGEREGISTRY_ROUTE_NAMESPACE" {
   default = "openshift-image-registry"
 }
 
-
 #Create Azure Agent Build via Helm on OCP
 resource "helm_release" "azure-build-agent-openshift" {
   name             = "azure-build-agent-openshift"
-  chart            = "../charts/azure-build-agent-openshift"
+  chart            = "../../charts/azure-build-agent-openshift"
   create_namespace = "true"
   namespace        = "${var.BUILD_NAMESPACE}"
   wait = "true"
@@ -94,7 +106,7 @@ resource "helm_release" "azure-build-agent-openshift" {
 resource "helm_release" "azure-pipeline" {
   depends_on = [helm_release.azure-build-agent-openshift]
   name             = "azure-devops-pipeline"
-  chart            = "../charts/azure-devops-pipeline"
+  chart            = "../../charts/azure-devops-pipeline"
   create_namespace = "true"
   namespace        = "${var.PIPELINE_NAMESPACE}"
   wait = "true"
@@ -119,7 +131,7 @@ resource "helm_release" "azure-pipeline" {
 #Get ImageRegistry Route(Will move to providers in the next version)
 
 data "external" "imageregistry_route" {
-  program = ["bash", "${path.module}/get-default-hostname.sh"]
+  program = ["bash", "../../scripts/get-default-hostname.sh"]
 
   query = {
     namespace = var.IMAGEREGISTRY_ROUTE_NAMESPACE
@@ -127,12 +139,11 @@ data "external" "imageregistry_route" {
   }
 }
 
-
 #Get Secret(Will move to providers in the next version)
 
 data "external" "sa_secret" {
   depends_on = [helm_release.azure-pipeline]
-  program = ["bash", "${path.module}/get-secret-token.sh"]
+  program = ["bash", "../../scripts/get-secret-token.sh"]
 
   query = {
     namespace = var.PIPELINE_NAMESPACE
@@ -144,7 +155,7 @@ data "external" "sa_secret" {
 
 data "external" "server_url" {
   depends_on = [helm_release.azure-pipeline]
-  program = ["bash", "${path.module}/get-server-info.sh"]
+  program = ["bash", "../../scripts/get-server-info.sh"]
 
 }
 
@@ -155,7 +166,7 @@ resource "azuredevops_project" "azure-devops-pipeline" {
   visibility = "private"
 }
 
-#Create an OpenShift Registry Service Connection
+#Create a Registry Service Connection
 
 resource "azuredevops_serviceendpoint_dockerregistry" "openshift-registry" {
   project_id            = azuredevops_project.azure-devops-pipeline.id
@@ -191,17 +202,27 @@ resource "azuredevops_serviceendpoint_github" "gitops-connection" {
   }
 }
 
+resource "azuredevops_git_repository" "github_repo_import" {
+  project_id = azuredevops_project.azure-devops-pipeline.id
+  name       = "Github DevOps Repository"
+  initialization {
+    init_type   = "Import"
+    source_type = "Git"
+    source_url  = chomp(format("%s://%s","https://github.com",var.GITHUB_REPO_NAME))
+  }
+}
+
 # Create an Azure DevOps Build Definition Connection
 
 resource "azuredevops_build_definition" "azuredevops_build_definition" {
   project_id = azuredevops_project.azure-devops-pipeline.id
-  name       = "OpenShift Pipeline Example"
+  name       = "OpenShift Pipeline Example2"
 
   repository {
     repo_type             = "GitHub"
-    repo_id               = "MoOyeg/azure-pipelines-openshift"
-    branch_name           = "main"
-    yml_path              = "azure-pipelines.yml"
+    repo_id               = var.GITHUB_REPO_NAME
+    branch_name           = var.GITHUB_REPO_BRANCH
+    yml_path              = var.GITHUB_AZURE_PIPELINE_PATH
     service_connection_id = azuredevops_serviceendpoint_github.gitops-connection.id
   }
 }
@@ -255,4 +276,15 @@ resource "azuredevops_pipeline_authorization" "azuredevops_pipeline_authorizatio
   resource_id = azuredevops_serviceendpoint_kubernetes.openshift-service-endpoint.id
   type        = "endpoint"
   pipeline_id = azuredevops_build_definition.azuredevops_build_definition.id
+}
+
+# Create an IncomingWebHook
+
+resource "azuredevops_serviceendpoint_incomingwebhook" "github-webhook" {
+  project_id            = azuredevops_project.azure-devops-pipeline.id
+  webhook_name          = "github-webhook"
+  secret                = "secret"
+  http_header           = "X-Hub-Signature"
+  service_endpoint_name = "Example IncomingWebhook"
+  description           = "Managed by Terraform"
 }

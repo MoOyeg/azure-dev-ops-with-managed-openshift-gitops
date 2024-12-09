@@ -6,3 +6,7 @@ pipeline-example1-terraform/.terraform/*
 testfile.txt
 .kube/config
 WIP/
+pipeline-example2-terraform/*/.terraform.lock.hcl
+pipeline-example2-terraform/*/terraform.tfstate
+pipeline-example2-terraform/*/terraform.tfstate.backup
+pipeline-example2-terraform/*/.terraform/*
