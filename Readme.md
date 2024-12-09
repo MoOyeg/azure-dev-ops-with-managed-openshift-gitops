@@ -142,7 +142,7 @@ helm uninstall azure-pipeline-openshift --namespace ado-openshift
   export TF_VAR_AZP_POOL="AzurePipeline"
   export TF_VAR_GITHUB_REPO_NAME="MoOyeg/azure-dev-ops-with-managed-openshift-gitops"
   export TF_VAR_GITHUB_REPO_BRANCH="main"
-  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="pipeline-example2-terraform/azure/azure-pipelines.yml"
+  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="/pipeline-example2-terraform/azure/azure-pipelines.yml"
   export AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
   export AZDO_ORG_SERVICE_URL=${TF_VAR_AZP_URL}
   export TF_VAR_AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}

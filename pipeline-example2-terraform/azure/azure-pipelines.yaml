@@ -11,10 +11,10 @@ trigger:
 
 resources:
  repositories:
-   - repository: my-web-react-app-gitops
+   - repository: github_repo_devops
      type: github
-     endpoint: arunhari82
-     name: arunhari82/my-web-react-app-gitops
+     endpoint: gitops-connection
+     name: MoOyeg/azure-dev-ops-with-managed-openshift-gitops
 
 pool:
   name: AzurePipeline

@@ -202,7 +202,7 @@ resource "azuredevops_serviceendpoint_github" "gitops-connection" {
   }
 }
 
-resource "azuredevops_git_repository" "github_repo_import" {
+resource "azuredevops_git_repository" "github_repo_devops" {
   project_id = azuredevops_project.azure-devops-pipeline.id
   name       = "Github DevOps Repository"
   initialization {
