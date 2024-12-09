@@ -34,15 +34,15 @@ stages:
           inputs:
             dockerVersion: '17.09.0-ce'
         - task: Docker@2
-          displayName: Login to Quay
+          displayName: Login to Registry
           inputs:
-            containerRegistry: 'quay-container-registry'
+            containerRegistry: 'container-registry-connection'
             command: 'login'
         - task: Docker@2
           displayName: Build and Push
           inputs:
-            containerRegistry: 'quay-container-registry'
-            repository: 'anattama/my-web-react-app'
+            containerRegistry: 'container-registry-connection'
+            repository: 'github_repo_devops'
             command: 'buildAndPush'
             Dockerfile: '**/Dockerfile'
             tags: $(GIT_SHA)
@@ -53,7 +53,7 @@ stages:
         displayName: Update Gitops Repo
         steps:
         
-          - checkout: my-web-react-app-gitops
+          - checkout: github_repo_devops
             displayName: Checkout Gitops Repository
             persistCredentials: true
           - task: Bash@3

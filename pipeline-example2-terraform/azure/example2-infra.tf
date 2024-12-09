@@ -170,12 +170,12 @@ resource "azuredevops_project" "azure-devops-pipeline" {
 
 resource "azuredevops_serviceendpoint_dockerregistry" "openshift-registry" {
   project_id            = azuredevops_project.azure-devops-pipeline.id
-  service_endpoint_name = "openshift-registry"  
+  service_endpoint_name = "container-registry-connection"  
   docker_registry = chomp(format("%s://%s","https",base64decode(data.external.imageregistry_route.result.encoded_route)))
   docker_username            = "${var.PIPELINE_SERVICEACCOUNT_NAME}"
   docker_password            = base64decode(data.external.sa_secret.result.encoded_secret)
   registry_type = "Others"
-  description = "OpenShift Pipeline Registry Service Connection"
+  description = "Registry Service Connection"
 }
 
 #Create an OpenShift Cluster Service Connection
