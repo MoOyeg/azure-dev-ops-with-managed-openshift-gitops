@@ -44,7 +44,7 @@ stages:
             containerRegistry: 'container-registry-connection'
             repository: 'github_repo_devops'
             command: 'buildAndPush'
-            Dockerfile: '**/Dockerfile'
+            Dockerfile: '/react-app-example/app/Dockerfile'
             tags: $(GIT_SHA)
   - stage: CD
     displayName: Update the Gitops Repo
@@ -64,19 +64,4 @@ stages:
                  sed -e 's/\(.*tag:\) \(.*\)/\1 $(GIT_SHA)/g' ./helm/app/values.yaml > ./helm/app/values.yaml.temp
                  rm ./helm/app/values.yaml
                  mv ./helm/app/values.yaml.temp ./helm/app/values.yaml
-          - task: Bash@3
-            displayName: Configure Git
-            inputs:
-              targetType: inline
-              script: |       
-                 git config --local user.email "73549783+arunhari82@users.noreply.github.com"
-                 git config --local user.name "arunhari82"
-                 git add ./helm/app/values.yaml
-               
-          - task: Bash@3
-            displayName: Commit and Push Gitops
-            inputs:
-              targetType: inline
-              script: |    
-                 git commit -m 'Updating Git Repo with image SHA : $(GIT_SHA)'
-                 git push origin HEAD:main
+
