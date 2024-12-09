@@ -47,7 +47,7 @@ stages:
             containerRegistry: 'container-registry-connection'
             repository: 'github_repo_devops'
             command: 'buildAndPush'
-            Dockerfile: '/react-app-example/app/Dockerfile'
+            Dockerfile: $(Build.SourcesDirectory)/react-app-example/app/Dockerfile
             tags: $(GIT_SHA)
   - stage: CD
     displayName: Update the Gitops Repo
