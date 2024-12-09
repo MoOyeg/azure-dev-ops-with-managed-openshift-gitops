@@ -41,12 +41,12 @@ stages:
         - task: CmdLine@2
           inputs:
             script: ls $(Build.SourcesDirectory)            
-        - task: Docker@2
+        - task: Docker@2.240.2
           displayName: Build and Push
           inputs:
             containerRegistry: 'container-registry-connection'
             repository: 'github_repo_devops'
-            command: 'buildAndPush'
+            command: 'build'
             Dockerfile: $(Build.SourcesDirectory)/react-app-example/app/Dockerfile
             tags: $(GIT_SHA)
   - stage: CD
