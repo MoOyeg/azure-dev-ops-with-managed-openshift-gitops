@@ -87,7 +87,8 @@ stages:
               git remote -v
               echo "GIT_BRANCH"
               echo "$GIT_BRANCH"
+              echo git branch -r
               echo "Ref"
               git show-ref
-              git push Origin $GIT_BRANCH --verbose
+              git push origin $GIT_BRANCH --verbose
 
