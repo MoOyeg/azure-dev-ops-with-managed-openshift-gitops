@@ -22,12 +22,6 @@ pool:
 variables:
   GIT_SHA: $(Build.SourceVersion)
   GIT_BRANCH: $(Build.SourceBranchName)
-  ref: $[ resources.repositories.github_repo_devops.ref ]
-  name: $[ resources.repositories.github_repo_devops.name ]
-  id: $[ resources.repositories.github_repo_devops.id ]
-  type: $[ resources.repositories.github_repo_devops.type ]
-  url: $[ resources.repositories.github_repo_devops.url ]
-  version: $[ resources.repositories.github_repo_devops.version ]
   project-name-dev: 'ado-openshift'
   image-name: 'ado-dotnet'
 
@@ -45,10 +39,17 @@ stages:
           displayName: Build and Push
           inputs:
             containerRegistry: 'container-registry-connection'
-            repository: 'github_repo_devops'
+            repository: '$(project-name-dev)/$(image-name)'
             command: 'build'
             Dockerfile: $(Build.SourcesDirectory)/react-app-example/app/Dockerfile
             tags: $(GIT_SHA)
+        - task: Docker@2.240.2
+          displayName: 'Push Docker image to OpenShift internal registry'
+          inputs:
+            command: 'push'
+            containerRegistry: 'openshift-registry'
+            repository: '$(project-name-dev)/$(image-name)'
+            tags: $(Build.BuildId)
       - job: deploy
         displayName: Update Gitops Repo
         steps:        
@@ -60,7 +61,9 @@ stages:
             inputs:
               targetType: inline
               script: |
-                echo ${url}
+                echo $(project-name-dev)
+                echo $(image-name)
+                ls $(Build.SourcesDirectory)
                 app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/prod/kustomization.yaml | cut -d ":" -f1)
                 if [ -z "$app_line_number" ]; then
                   echo "Will not replace the image in the kustomization.yaml file"
