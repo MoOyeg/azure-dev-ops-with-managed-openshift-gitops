@@ -62,18 +62,24 @@ stages:
               echo $(project-name-dev)
               echo $(image-name)
               ls $(Build.SourcesDirectory)
-              app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/prod/kustomization.yaml | cut -d ":" -f1)
+              app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml | cut -d ":" -f1)
               if [ -z "$app_line_number" ]; then
                 echo "Will not replace the image in the kustomization.yaml file"
               else
                   image_line_number=$((app_line_number + 1))
-                  sed -i "${image_line_number}s,.*,   newName: ${image}," $(Build.SourcesDirectory)/react-app-example/manifests/prod/kustomization.yaml
+                  sed -i "${image_line_number}s,.*,   newName: $(project-name-dev)/$(image-name)," $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml
                   if [ $? -ne 0 ]; then
                       echo "Error in replacing the image in the kustomization.yaml file"
                   else
                       echo "Image replaced in the Dev kustomization.yaml file"
                       image_tage_line_number=$((app_line_number + 2))
-                      sed -i "${image_tage_line_number}s,.*,   newTag: $image_tag," /root/repos/azure-dev-ops-with-managed-openshift-gitops/react-app-example/manifests/prod/kustomization.yaml
+                      sed -i "${image_tage_line_number}s,.*,   newTag: $(Build.BuildId)," /root/repos/azure-dev-ops-with-managed-openshift-gitops/react-app-example/manifests/dev/kustomization.yaml
                       echo "Image Tag replaced in the Prod kustomization.yaml file"        
                   fi
               fi
+              cat $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml
+              cd $(Build.SourcesDirectory)
+
+              git config --local user.name "azure-pipeline-bot"
+              git add ./react-app-example/manifests/dev/kustomization.yaml
+              git commit -m 'Updating Git Repo with image BuildID : $(Build.BuildId)'
