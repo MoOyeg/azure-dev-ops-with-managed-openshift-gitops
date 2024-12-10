@@ -85,4 +85,5 @@ stages:
               git add ./react-app-example/manifests/dev/kustomization.yaml
               git commit -m 'Updating Git Repo with image BuildID : $(Build.BuildId)'
               branch=$(git branch | grep "*" | cut -d " " -f2)
-              git push origin $branch
+              echo $branch
+              git push origin $branch --verbose
