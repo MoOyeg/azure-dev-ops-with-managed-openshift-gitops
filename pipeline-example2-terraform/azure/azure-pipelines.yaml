@@ -42,7 +42,7 @@ stages:
             repository: '$(project-name-dev)/$(image-name)'
             command: 'build'
             Dockerfile: $(Build.SourcesDirectory)/react-app-example/app/Dockerfile
-            tags: $(GIT_SHA)
+            tags: $(Build.BuildId)
         - task: Docker@2.240.2
           displayName: 'Push Docker image to OpenShift internal registry'
           inputs:
