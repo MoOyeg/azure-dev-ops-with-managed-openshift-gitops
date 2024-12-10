@@ -28,6 +28,8 @@ variables:
   type: $[ resources.repositories.github_repo_devops.type ]
   url: $[ resources.repositories.github_repo_devops.url ]
   version: $[ resources.repositories.github_repo_devops.version ]
+  project-name-dev: 'ado-openshift'
+  image-name: 'ado-dotnet'
 
 stages:
   - stage: CI
