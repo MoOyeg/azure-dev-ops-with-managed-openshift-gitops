@@ -22,6 +22,12 @@ pool:
 variables:
   GIT_SHA: $(Build.SourceVersion)
   GIT_BRANCH: $(Build.SourceBranchName)
+  ref: $[ resources.repositories.github_repo_devops.ref ]
+  name: $[ resources.repositories.github_repo_devops.name ]
+  id: $[ resources.repositories.github_repo_devops.id ]
+  type: $[ resources.repositories.github_repo_devops.type ]
+  url: $[ resources.repositories.github_repo_devops.url ]
+  version: $[ resources.repositories.github_repo_devops.version ]
 
 stages:
   - stage: CI
@@ -52,7 +58,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                echo ${resources.repositories.github_repo_devops.url}
+                echo ${url}
                 app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/prod/kustomization.yaml | cut -d ":" -f1)
                 if [ -z "$app_line_number" ]; then
                   echo "Will not replace the image in the kustomization.yaml file"
