@@ -41,13 +41,9 @@ stages:
             command: 'build'
             Dockerfile: $(Build.SourcesDirectory)/react-app-example/app/Dockerfile
             tags: $(GIT_SHA)
-  - stage: CD
-    displayName: Update the Gitops Repo
-    jobs:
       - job: deploy
         displayName: Update Gitops Repo
-        steps:
-        
+        steps:        
           - checkout: github_repo_devops
             displayName: Checkout Gitops Repository
             persistCredentials: true
@@ -56,7 +52,21 @@ stages:
             inputs:
               targetType: inline
               script: |
-                 sed -e 's/\(.*tag:\) \(.*\)/\1 $(GIT_SHA)/g' ./helm/app/values.yaml > ./helm/app/values.yaml.temp
-                 rm ./helm/app/values.yaml
-                 mv ./helm/app/values.yaml.temp ./helm/app/values.yaml
+                echo resources.repositories.github_repo_devopsupda.url
+                app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/prod/kustomization.yaml | cut -d ":" -f1)
+                if [ -z "$app_line_number" ]; then
+                  echo "Will not replace the image in the kustomization.yaml file"
+                else
+                    image_line_number=$((app_line_number + 1))
+                    sed -i "${image_line_number}s,.*,   newName: ${image}," $(Build.SourcesDirectory)/react-app-example/manifests/prod/kustomization.yaml
+                    if [ $? -ne 0 ]; then
+                        echo "Error in replacing the image in the kustomization.yaml file"
+                    else
+                        echo "Image replaced in the Devkustomization.yaml file"
+                        image_tage_line_number=$((app_line_number + 2))
+                        sed -i "${image_tage_line_number}s,.*,   newTag: $image_tag," /root/repos/azure-dev-ops-with-managed-openshift-gitops/react-app-example/manifests/prod/kustomization.yaml
+                        echo "Image Tag replaced in the Prod kustomization.yaml file"        
+                    fi
+                fi
+
 
