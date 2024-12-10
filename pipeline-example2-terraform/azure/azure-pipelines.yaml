@@ -20,10 +20,14 @@ pool:
   name: AzurePipeline
 
 variables:
-  GIT_SHA: $(Build.SourceVersion)
-  GIT_BRANCH: $(Build.SourceBranchName)
-  project-name-dev: 'ado-openshift'
-  image-name: 'ado-dotnet'
+- name: GIT_SHA
+  value: $(Build.SourceVersion)
+- name: GIT_BRANCH
+  value: $(Build.SourceBranchName)
+- name: project-name-dev
+  value: 'ado-openshift'
+- name: image-name
+  value: 'ado-dotnet'
 
 stages:
   - stage: CI
