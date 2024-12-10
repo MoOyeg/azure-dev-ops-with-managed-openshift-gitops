@@ -47,7 +47,7 @@ stages:
           displayName: 'Push Docker image to OpenShift internal registry'
           inputs:
             command: 'push'
-            containerRegistry: 'openshift-registry'
+            containerRegistry: 'container-registry-connection'
             repository: '$(project-name-dev)/$(image-name)'
             tags: $(Build.BuildId)
       - job: deploy
