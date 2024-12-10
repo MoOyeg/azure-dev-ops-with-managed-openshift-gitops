@@ -52,7 +52,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                echo resources.repositories.github_repo_devopsupda.url
+                echo ${resources.repositories.github_repo_devops.url}
                 app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/prod/kustomization.yaml | cut -d ":" -f1)
                 if [ -z "$app_line_number" ]; then
                   echo "Will not replace the image in the kustomization.yaml file"
