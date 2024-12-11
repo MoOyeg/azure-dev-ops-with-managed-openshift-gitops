@@ -61,10 +61,10 @@ Pipeline Example 1 will
   ```bash
   export TF_VAR_AZP_URL=https://dev.azure.com/YourOrg
   export TF_VAR_AZP_TOKEN=.......
-  export TF_VAR_AZP_POOL="AzurePipeline" #Should match what was set in azure-pipelines.yaml in repo above
-  export TF_VAR_GITHUB_REPO_NAME="MoOyeg/azure-pipelines-openshift" #Your forked repo
+  export TF_VAR_AZP_POOL="AzurePipeline"
+  export TF_VAR_GITHUB_REPO_NAME="MoOyeg/azure-pipelines-openshift"
   export TF_VAR_GITHUB_REPO_BRANCH="main"
-  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="azure-pipelines.yml" #Location for pipeline file in repo
+  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="azure-pipelines.yml"
   export AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
   export AZDO_ORG_SERVICE_URL=${TF_VAR_AZP_URL}
   export TF_VAR_AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
@@ -123,6 +123,7 @@ helm install azure-pipeline-openshift \
 --set serviceAccount.name="azure-sa" \
 --set serviceAccount.secretname="azure-sa-devops-secret" \
 --set buildNamespace="azure-build" \
+--set deploy_arogcd_app="false" \
 --namespace ado-openshift
 ```
 
