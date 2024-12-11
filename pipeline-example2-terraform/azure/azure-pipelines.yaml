@@ -59,7 +59,7 @@ stages:
           inputs:
             targetType: inline
             script: |
-              git branch
+              git checkout $GIT_BRANCH
 
               app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml | cut -d ":" -f1)
               if [ -z "$app_line_number" ]; then
