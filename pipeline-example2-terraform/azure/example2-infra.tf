@@ -99,6 +99,7 @@ resource "helm_release" "azure-build-agent-openshift" {
     value = var.BUILD_SERVICEACCOUNT_NAME
   }
 
+
 }
 
 #Create Azure Resources Pipeline will deploy into on OCP via Helm
@@ -126,6 +127,21 @@ resource "helm_release" "azure-pipeline" {
     value = var.BUILD_NAMESPACE
   }
 
+  set {
+    name = "deploy_arogcd_app"
+    value = "true"
+  }
+
+  set {
+    name = "github_repo_devops"
+    value = var.GITHUB_REPO_NAME
+  }
+
+  set {
+    name = "github_repo_devops_ref"
+    value = var.GITHUB_REPO_BRANCH
+  }
+  
 }
 
 #Get ImageRegistry Route(Will move to providers in the next version)

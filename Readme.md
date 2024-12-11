@@ -5,6 +5,9 @@ It's styled around the steps discussed here
 - [Hosting an Azure Pipelines Build Agent in OpenShift](https://www.redhat.com/en/blog/hosting-an-azure-pipelines-build-agent-in-openshift)
 It uses Terraform and Helm to deploy the example described above.
 
+Repo contains example Azure Pipeline Deployment and automation
+- [Pipeline Example 1](#deploy-pipeline-example-1)
+
 ## Requirements
   - Terraform >=v1.10.0
   - Helm
@@ -14,7 +17,7 @@ It uses Terraform and Helm to deploy the example described above.
   - Bash(Some of the Terraform steps call out to Bash Scripts)
   - Was run and tested with OCP 4.15 
 
-## Steps
+## General Steps
 
 - This example requires the OpenShift Image Registry is publically exposed.
   ```bash
@@ -23,9 +26,7 @@ It uses Terraform and Helm to deploy the example described above.
 
 - [Create Azure DevOps Personal Access Token](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=Windows). Automation was tested with a token that had full access.
   
-- [Fork Sample Github Repository](https://github.com/rh-mobb/azure-pipelines-openshift).Please edit the your azure-pipelines.yaml file to change the name of the devops pool to a name of your choice. Example - [azure-pipelines.yaml](https://github.com/MoOyeg/azure-pipelines-openshift/blob/main/azure-pipelines.yml). The automation expects to create the pool and will fail if the pool already exists. Pool name cannot be "Default"
-
-- [Create your Github Personal Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).You can use fine-grained tokens restricted to the repo forked in step above but will full access. 
+- [Create your Github Personal Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).You can use fine-grained tokens restricted to the repos you will fork for the examples below.
 
 - Automation requires that you are logged into OpenShift Cluster before running and that you provide the active kubeconfig as part of the steps.
 Example method to be run inside cloned repo folder
@@ -36,7 +37,17 @@ Example method to be run inside cloned repo folder
   oc login
   ```
 
-- Export the variables needed for automation
+## Deploy Pipeline Example 1
+Pipeline Example 1 will 
+  1 Use Terraform to deploy an Azure DevOps Build Agent on OpenShift
+  2 Will create the required Azure Infrastucture on Azure DevOps(Pipeline, Registry and access to OpenShift)
+  3 When pipeline is started, Pipeline will build a Dotnet image, push it into the internal OpenShift image registry and deploy a sample application using that image.
+
+### Steps to deploy Example 1
+- [Fork Sample Github Repository](https://github.com/rh-mobb/azure-pipelines-openshift).Please edit the your azure-pipelines.yaml file, change the name of the devops pool to a name of your choice. Example - [azure-pipelines.yaml](https://github.com/MoOyeg/azure-pipelines-openshift/blob/main/azure-pipelines.yml)- Example used "AzurePipeline" . The automation expects to create the pool and will fail if the pool already exists. Pool name cannot be "Default"
+
+- Export the variables needed for automation 
+
   TF_VAR_AZP_URL = AZURE DevOps Org URL
   TF_VAR_AZP_TOKEN = Azure DevOps Personal Access Token
   TF_VAR_AZP_POOL = Azure DevOps Pool name set in azure-pipelines.yaml above
@@ -46,14 +57,14 @@ Example method to be run inside cloned repo folder
   TF_VAR_AZDO_GITHUB_SERVICE_CONNECTION_PAT = Github Personal Token
   TF_VAR_KUBE_CONFIG_PATH = Path to active kubeconfig file
 
-  Example
+  Example Export
   ```bash
   export TF_VAR_AZP_URL=https://dev.azure.com/YourOrg
   export TF_VAR_AZP_TOKEN=.......
-  export TF_VAR_AZP_POOL="AzurePipeline"
-  export TF_VAR_GITHUB_REPO_NAME="MoOyeg/azure-pipelines-openshift"
+  export TF_VAR_AZP_POOL="AzurePipeline" #Should match what was set in azure-pipelines.yaml in repo above
+  export TF_VAR_GITHUB_REPO_NAME="MoOyeg/azure-pipelines-openshift" #Your forked repo
   export TF_VAR_GITHUB_REPO_BRANCH="main"
-  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="azure-pipelines.yml"
+  export TF_VAR_GITHUB_AZURE_PIPELINE_PATH="azure-pipelines.yml" #Location for pipeline file in repo
   export AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
   export AZDO_ORG_SERVICE_URL=${TF_VAR_AZP_URL}
   export TF_VAR_AZDO_PERSONAL_ACCESS_TOKEN=${TF_VAR_AZP_TOKEN}
@@ -63,7 +74,7 @@ Example method to be run inside cloned repo folder
   export TF_VAR_KUBE_CONFIG_PATH=${KUBECONFIG}
   ```
 
-- Deployment of Pipeline Example
+- Run automation to deploy pipeline exxample
 
   ```bash
   cd ./pipeline-example1-terraform
@@ -86,7 +97,7 @@ Example method to be run inside cloned repo folder
 
   - P.S There is a small error that might show up. "Error: no names or ids specified. Havent yet figured out what causes it. Pipeline should still run successfully.
 
-- CleanUp Steps
+### CleanUp Example 1
 
   ```bash
   terraform destroy
@@ -121,9 +132,24 @@ helm uninstall azure-build-agent-openshift --namespace azure-build
 helm uninstall azure-pipeline-openshift --namespace ado-openshift
 ```
 
-## Example 2
+## Deploy Pipeline Example 2
+Pipeline Example 2 will 
+  1 Install OpenShift gitops 
+  1 Use Terraform to deploy an Azure DevOps Build Agent on OpenShift and an ArgoCD Application
+  2 Will create the required Azure Infrastucture on Azure DevOps(Pipeline, Registry and access to OpenShift)
+  3 When pipeline is started, Pipeline will build a react image, push it into the internal OpenShift image registry. Pipeline will update the git repo with the details of the new image which the ArgoCD application should auto sync.
 
+### Steps to deploy Example 2
 
+- [Destroy Example 1 if installed before proceeding](#cleanup-example-1)
+
+- Install OpenShift Gitops
+  ```bash
+  oc apply -k https://github.com/redhat-cop/gitops-catalog/openshift-gitops-operator/operator/overlays/latest
+  ```
+
+- Give OpenShift Gitops permission for our soon to be created application namespace
+  oc adm policy add-cluster-role-to-user admin system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller -n ado-openshift
 
 - Export the variables needed for automation
   TF_VAR_AZP_URL = AZURE DevOps Org URL
@@ -151,3 +177,8 @@ helm uninstall azure-pipeline-openshift --namespace ado-openshift
   export KUBE_CONFIG_PATH=${KUBECONFIG}
   export TF_VAR_KUBE_CONFIG_PATH=${KUBECONFIG}
   ```
+
+
+
+  oc apply -k https://github.com/redhat-cop/gitops-catalog/openshift-gitops-operator/operator/overlays/latest
+  oc adm policy add-cluster-role-to-user admin system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller -n ado-openshift

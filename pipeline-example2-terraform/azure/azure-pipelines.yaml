@@ -70,7 +70,6 @@ stages:
           inputs:
             targetType: inline
             script: |
-              ls $(Build.SourcesDirectory)
               app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml | cut -d ":" -f1)
               if [ -z "$app_line_number" ]; then
                 echo "Will not replace the image in the kustomization.yaml file"
@@ -86,18 +85,10 @@ stages:
                       echo "Image Tag replaced in the Prod kustomization.yaml file"        
                   fi
               fi
-              cat $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml
               cd $(Build.SourcesDirectory)
-
               git config --local user.name "azure-pipeline-bot"
               git config --local user.email "azure-pipeline-bot@users.noreply.github.com"
               git add ./react-app-example/manifests/dev/kustomization.yaml
               git commit -m 'Updating Git Repo with image BuildID : $(Build.BuildId)'
-              git remote -v
-              echo "GIT_BRANCH"
-              echo "$GIT_BRANCH"
-              echo git branch -r
-              echo "Ref"
-              git show-ref
               git push origin HEAD:$GIT_BRANCH
 

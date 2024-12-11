@@ -2,7 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ado-gitops-example2
-  annotations: {}
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
 spec:
   selector:
     matchLabels:

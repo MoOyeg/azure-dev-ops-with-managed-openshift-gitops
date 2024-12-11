@@ -9,20 +9,6 @@ variable "AZDO_ORG_SERVICE_URL" {
   type = string
 }
 
-variable "GITHUB_REPO_NAME" {
-  type = string
-}
-
-variable "GITHUB_REPO_BRANCH" {
-  type = string
-  default = "main"
-}
-
-variable "GITHUB_AZURE_PIPELINE_PATH" {
-  type = string
-  default = "azure-pipelines.yml"
-}
-
 variable "AZP_URL" {
   type = string
 }
@@ -36,6 +22,19 @@ variable "AZP_POOL" {
   type = string
 }
 
+variable "GITHUB_REPO_NAME" {
+  type = string
+}
+
+variable "GITHUB_REPO_BRANCH" {
+  type = string
+  default = "main"
+}
+
+variable "GITHUB_AZURE_PIPELINE_PATH" {
+  type = string
+  default = "azure-pipelines.yml"
+}
 
 variable "PIPELINE_NAMESPACE" {
   type = string
@@ -72,11 +71,10 @@ variable "IMAGEREGISTRY_ROUTE_NAMESPACE" {
   default = "openshift-image-registry"
 }
 
-
 #Create Azure Agent Build via Helm on OCP
 resource "helm_release" "azure-build-agent-openshift" {
   name             = "azure-build-agent-openshift"
-  chart            = "../charts/azure-build-agent-openshift"
+  chart            = "../../charts/azure-build-agent-openshift"
   create_namespace = "true"
   namespace        = "${var.BUILD_NAMESPACE}"
   wait = "true"
@@ -101,6 +99,7 @@ resource "helm_release" "azure-build-agent-openshift" {
     value = var.BUILD_SERVICEACCOUNT_NAME
   }
 
+
 }
 
 #Create Azure Resources Pipeline will deploy into on OCP via Helm
@@ -108,7 +107,7 @@ resource "helm_release" "azure-build-agent-openshift" {
 resource "helm_release" "azure-pipeline" {
   depends_on = [helm_release.azure-build-agent-openshift]
   name             = "azure-devops-pipeline"
-  chart            = "../charts/azure-devops-pipeline"
+  chart            = "../../charts/azure-devops-pipeline"
   create_namespace = "true"
   namespace        = "${var.PIPELINE_NAMESPACE}"
   wait = "true"
@@ -128,6 +127,21 @@ resource "helm_release" "azure-pipeline" {
     value = var.BUILD_NAMESPACE
   }
 
+  set {
+    name = "deploy_arogcd_app"
+    value = "true"
+  }
+
+  set {
+    name = "github_repo_devops"
+    value = var.GITHUB_REPO_NAME
+  }
+
+  set {
+    name = "github_repo_devops_ref"
+    value = var.GITHUB_REPO_BRANCH
+  }
+  
 }
 
 #Get ImageRegistry Route(Will move to providers in the next version)
