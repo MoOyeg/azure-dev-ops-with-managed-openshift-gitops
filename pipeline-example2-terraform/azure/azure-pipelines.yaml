@@ -54,6 +54,12 @@ stages:
             containerRegistry: 'container-registry-connection'
             repository: '$(project-name-dev)/$(image-name)'
             tags: $(Build.BuildId)
+      - job: update Git Repo
+        displayName: Update Gitops Repo
+        steps:        
+          - checkout: github_repo_devops
+            displayName: Checkout Gitops Repository
+            persistCredentials: true
         - task: Bash@3
           displayName: Update image SHA signature
           inputs:
