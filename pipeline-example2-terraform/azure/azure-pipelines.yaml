@@ -26,7 +26,7 @@ variables:
 - name: project-name-dev
   value: 'ado-openshift'
 - name: image-name
-  value: 'ado-dotnet'
+  value: 'ado-react-app'
 
 stages:
   - stage: CI
@@ -53,6 +53,10 @@ stages:
             containerRegistry: 'container-registry-connection'
             repository: '$(project-name-dev)/$(image-name)'
             tags: $(Build.BuildId)
+  - stage: Update_Gitops_Repo
+    dependsOn: CI
+    displayName: Gitops Update Stage
+    jobs:
       - job: update_Git_Repo
         displayName: Update Gitops Repo
         steps:

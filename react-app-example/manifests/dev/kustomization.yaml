@@ -1,7 +1,7 @@
 resources:
-  - ../../resources
+  - ../resources
 
 images:
- - name: test
+ - name: replace-image
    newName: ado-openshift/ado-dotnet
-   newTag: 87
+   newTag: "87"

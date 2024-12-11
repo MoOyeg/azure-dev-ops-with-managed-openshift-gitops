@@ -1,13 +1,12 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: test
-  namespace: default
+  name: ado-gitops-example2
   labels: {}
 spec:
   to:
     kind: Service
-    name: test
+    name: ado-gitops-example2
   tls: {}
   port:
     targetPort: 8080

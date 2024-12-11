@@ -1,23 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: default
-  name: test
+  name: ado-gitops-example2
   annotations: {}
 spec:
   selector:
     matchLabels:
-      app: test
+      app: ado-gitops-example2
   replicas: 1
   template:
     metadata:
       labels:
-        app: test
+        app: ado-gitops-example2
     spec:
       containers:
         - name: container
-          image: >-
-            image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+          image: replace-image
           ports:
             - containerPort: 8080
               protocol: TCP
