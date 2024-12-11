@@ -65,6 +65,7 @@ stages:
           inputs:
             targetType: inline
             script: |
+              ls $(Build.SourcesDirectory)
               app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml | cut -d ":" -f1)
               if [ -z "$app_line_number" ]; then
                 echo "Will not replace the image in the kustomization.yaml file"
