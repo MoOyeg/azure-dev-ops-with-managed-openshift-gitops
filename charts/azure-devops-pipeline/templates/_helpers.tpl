@@ -72,6 +72,6 @@ Create the name of the service account to use
 
 
 {{- define "argo_app_repo_url" -}}
-{{- $tempimgurl := printf "%s/%s" (printf "https://") .Values.github_repo_devops }}
+{{- $tempimgurl := printf "%s/%s" (printf "https:/") .Values.github_repo_devops }}
 {{- printf  $tempimgurl }}
 {{- end }}
