@@ -62,14 +62,14 @@ stages:
         steps:
         - checkout: github_repo_devops
           displayName: Checkout Gitops Repository
-          clean: true 
-          
+          clean: true          
           persistCredentials: true
         - task: Bash@3
           displayName: Update image SHA signature
           inputs:
             targetType: inline
             script: |
+              ls $(Build.SourcesDirectory)
               app_line_number=$(grep -n "name: test" $(Build.SourcesDirectory)/react-app-example/manifests/dev/kustomization.yaml | cut -d ":" -f1)
               echo $app_line_number
               echo $(Build.SourcesDirectory)
